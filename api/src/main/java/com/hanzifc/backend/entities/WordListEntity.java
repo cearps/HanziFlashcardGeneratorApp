@@ -9,16 +9,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity {
+public class WordListEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String username;
-    @Column(unique = true)
-    private String email;
-    private String password; // store hashed password
+    private String name;
 
+    // owner of the word list
+    @ManyToOne
+    private UserEntity user;
 }
