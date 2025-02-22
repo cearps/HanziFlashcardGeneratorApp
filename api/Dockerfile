@@ -1,5 +1,5 @@
 # Use the official Gradle image as the base image
-FROM gradle:jdk-21-and-22-graal AS build
+FROM gradle:jdk-21-and-23-graal AS build
 
 # Set the working directory
 WORKDIR /app
