@@ -4,9 +4,6 @@ import com.hanzifc.backend.entities.UserEntity;
 import com.hanzifc.backend.repository.UserRepository;
 import com.hanzifc.backend.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     @Autowired
-    private AuthenticationManager authManager;
-    @Autowired
     private JwtService jwtService;
     @Autowired
     private UserRepository userRepository;
@@ -27,31 +22,38 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     // DTOs
-    public static record RegisterRequest(String username, String password) { }
-    public static record AuthRequest(String usernameOrEmail, String password) { }
-    public static record AuthResponse(String token) { }
+    public record RegisterRequest(String username, String email, String password) { }
+    public record AuthRequest(String usernameOrEmail, String password) { }
+    public record RegisterResponse(Boolean success, String message) { }
 
     @PostMapping("/register")
-    public String register(@RequestBody RegisterRequest request) {
+    public RegisterResponse register(@RequestBody RegisterRequest request) {
+        // check if username or email already exists
+        if (userRepository.existsByUsername(request.username())) {
+            return new RegisterResponse(false, "Username already exists!");
+        }
+        if (userRepository.existsByEmail(request.email())) {
+            return new RegisterResponse(false, "Email already exists!");
+        }
         UserEntity newUser = new UserEntity();
         newUser.setUsername(request.username());
-        newUser.setEmail(request.username());
+        newUser.setEmail(request.email());
         newUser.setPassword(passwordEncoder.encode(request.password()));
 
         userRepository.save(newUser);
-        return "User registered successfully!";
+        return new RegisterResponse(true, "User registered successfully!");
     }
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody AuthRequest request) {
-        Authentication authentication = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.usernameOrEmail(),
-                        request.password()
-                )
-        );
+    public JwtService.TokenResponse login(@RequestBody AuthRequest request) {
+        UserEntity user = userRepository.findByUsername(request.usernameOrEmail())
+                .orElseGet(() -> userRepository.findByEmail(request.usernameOrEmail())
+                        .orElseThrow(() -> new RuntimeException("User not found!")));
 
-        String token = jwtService.generateToken(request.usernameOrEmail());
-        return new AuthResponse(token);
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new RuntimeException("Invalid password!");
+        }
+
+        return jwtService.generateToken(user.getUsername());
     }
 }
