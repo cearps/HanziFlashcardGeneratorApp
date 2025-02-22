@@ -9,3 +9,13 @@ Other potential ideas for this application include:
 - Audio recordings from native speakers
 
 加油！
+
+## Dev Setup
+1. Provision PostgreSQL Docker container
+<code> docker run -d \
+  --name local-postgres \
+  -e POSTGRES_USER=myusername \
+  -e POSTGRES_PASSWORD=mypassword \
+  -e POSTGRES_DB=mydatabase \
+  -p 5434:5432 \
+  postgres:latest</code>
