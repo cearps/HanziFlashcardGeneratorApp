@@ -1,5 +1,5 @@
 // src/components/Header.tsx
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router";
 import { useAuth } from "~/context/AuthContext";
 
@@ -7,6 +7,10 @@ interface HeaderProps {}
 
 const Header: React.FC<HeaderProps> = () => {
   const { user, loading } = useAuth();
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <header className="bg-white shadow-md">

@@ -6,6 +6,12 @@ export default [
 
     route("/login", "routes/login.tsx"),
     route("/register", "routes/register.tsx"),
+
+    // Protected routes
+    // route("/profile", "routes/profile.tsx"), // TODO: Create this route
     route("/logout", "routes/logout.tsx"),
+
+    // Catch-all route
+    route("*", "routes/notFound.tsx"),
   ]),
 ] satisfies RouteConfig;

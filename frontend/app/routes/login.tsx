@@ -5,7 +5,7 @@ import { useAuth } from "~/context/AuthContext";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { login, user } = useAuth();
+  const { login, user, logout } = useAuth();
 
   useEffect(() => {
     if (user) {
@@ -29,6 +29,7 @@ const Login: React.FC = () => {
       });
 
       if (!response.ok) {
+        logout();
         throw new Error("Invalid credentials or server error");
       }
 

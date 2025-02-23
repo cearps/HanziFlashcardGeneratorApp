@@ -2,18 +2,20 @@ import React, { createContext, useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router";
 import { API_BASE_URL } from "~/config/apiConfig";
 
+// Define a user interface as needed
 interface User {
   username: string;
   email: string;
+  // other fields...
 }
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
-  login: (token: string) => Promise<void>;
+  login: (newToken: string) => Promise<void>;
   logout: () => void;
-  verifyToken: () => Promise<void>;
+  verifyToken: (overrideToken?: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -34,58 +36,71 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const navigate = useNavigate();
 
-  // 1. On initial load, check localStorage for a token and verify it
+  // On initial load, get token from local storage
+  // We'll verify in a useEffect below
   useEffect(() => {
     const storedToken = localStorage.getItem("jwt");
     if (storedToken) {
       setToken(storedToken);
     }
-    // We'll call verifyToken (below) to see if that token is valid
-    verifyToken().finally(() => setLoading(false));
-    // eslint-disable-next-line
+    setLoading(false);
   }, []);
 
-  // 2. Method: verify the token by calling /auth/me
-  const verifyToken = async () => {
-    if (!token) {
+  // 1. Whenever 'token' changes, verify it
+  //    If 'token' is null => setUser(null), else call verify.
+  useEffect(() => {
+    if (token) {
+      verifyToken(token);
+    } else {
+      setUser(null);
+    }
+    // eslint-disable-next-line
+  }, [token]);
+
+  // 2. verifyToken can also be called directly with an override token
+  const verifyToken = async (overrideToken?: string) => {
+    const localToken = overrideToken ?? token;
+    if (!localToken) {
       setUser(null);
       return;
     }
     try {
-      const response = await fetch(API_BASE_URL + "/me", {
+      const response = await fetch(`${API_BASE_URL}/me`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localToken}`,
         },
       });
       if (!response.ok) {
         // Token invalid or expired => clear user & token
         setUser(null);
         localStorage.removeItem("jwt");
+        setToken(null);
       } else {
         const currentUser = await response.json();
+        // console.log("Verified user", currentUser);
         setUser(currentUser);
       }
     } catch (err) {
       setUser(null);
       localStorage.removeItem("jwt");
+      setToken(null);
     }
   };
 
-  // 3. Method: login (store token, call verify)
+  // 3. login sets token and localStorage
+  //    The effect [token] will trigger verifyToken
   const login = async (newToken: string) => {
     setToken(newToken);
     localStorage.setItem("jwt", newToken);
-    await verifyToken();
   };
 
-  // 4. Method: logout
+  // 4. logout clears user, token, localStorage
   const logout = () => {
     setUser(null);
     setToken(null);
     localStorage.removeItem("jwt");
-    navigate("/login");
   };
 
   const value: AuthContextType = {
@@ -100,7 +115,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Convenient custom hook:
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+// Custom hook for easy use
+export const useAuth = () => useContext(AuthContext);

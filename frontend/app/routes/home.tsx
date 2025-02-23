@@ -7,6 +7,13 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function Home() {
-  return <h1>Hanzi Flashcard App</h1>;
-}
+const Home: React.FC = () => {
+  return (
+    <div className="text-center mt-12">
+      <h1 className="text-4xl font-bold">Hanzi Flashcard App</h1>
+      <p className="mt-4 text-lg">欢迎你来到我的新app！</p>
+    </div>
+  );
+};
+
+export default Home;
