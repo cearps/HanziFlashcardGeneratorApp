@@ -1,5 +1,4 @@
 import type { Route } from "./+types/home";
-import BaseLayout from "~/sections/base";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,9 +8,5 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return (
-    <BaseLayout>
-      <h1>test</h1>
-    </BaseLayout>
-  );
+  return <h1>Hanzi Flashcard App</h1>;
 }

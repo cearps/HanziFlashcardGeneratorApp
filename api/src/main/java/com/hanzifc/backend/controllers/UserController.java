@@ -10,18 +10,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
 
+    // DTOs
+    public record UserResponse(String username, String email) { }
+
     @Autowired
     private UserRepository userRepository;
 
     @GetMapping("/me")
-    public String me() {
-
+    public UserResponse me() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = userDetails.getUsername();
 
-        return userRepository.findByUsername(username)
-                .map(user -> "Hello, " + user.getUsername() + "!")
+        var user = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found!"));
+
+        return new UserResponse(user.getUsername(), user.getEmail());
     }
+
 
 }

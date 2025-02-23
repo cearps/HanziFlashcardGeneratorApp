@@ -1,9 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { API_BASE_URL } from "~/config/apiConfig";
+import { useAuth } from "~/context/AuthContext";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { login, user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   const [usernameOrEmail, setUsernameOrEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -28,8 +36,8 @@ const Login: React.FC = () => {
       // data should contain { token: '...' }
       const token = data.token;
 
-      // Store token in localStorage (or sessionStorage)
-      localStorage.setItem("jwt", token);
+      // Call the login method from AuthContext
+      await login(token);
 
       // Redirect to home page
       navigate("/");
