@@ -4,12 +4,16 @@ export default [
   route("/", "layouts/base.tsx", [
     index("routes/home.tsx"),
 
-    route("/login", "routes/login.tsx"),
-    route("/register", "routes/register.tsx"),
+    route("login", "routes/auth/login.tsx"),
+    route("register", "routes/auth/register.tsx"),
 
     // Protected routes
-    // route("/profile", "routes/profile.tsx"), // TODO: Create this route
-    route("/logout", "routes/logout.tsx"),
+    route("/app", "routes/protectedRoute.tsx", [
+      // index("routes/app/dashboard.tsx"),
+      route("profile", "routes/app/profile.tsx"),
+      route("logout", "routes/auth/logout.tsx"),
+      // route("settings", "routes/app/settings.tsx"),
+    ]),
 
     // Catch-all route
     route("*", "routes/notFound.tsx"),

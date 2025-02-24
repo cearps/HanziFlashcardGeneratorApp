@@ -30,7 +30,7 @@ const Header: React.FC<HeaderProps> = () => {
                 </li>
                 <li>
                   <Link
-                    to="/logout"
+                    to="/app/logout"
                     className="text-gray-600 hover:text-gray-900 transition"
                   >
                     Logout
