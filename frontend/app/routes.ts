@@ -9,7 +9,7 @@ export default [
 
     // Protected routes
     route("/app", "routes/protectedRoute.tsx", [
-      // index("routes/app/dashboard.tsx"),
+      index("routes/app/dashboard.tsx"),
       route("profile", "routes/app/profile.tsx"),
       route("logout", "routes/auth/logout.tsx"),
       // route("settings", "routes/app/settings.tsx"),

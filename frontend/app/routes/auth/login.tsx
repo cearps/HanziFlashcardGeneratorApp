@@ -41,7 +41,7 @@ const Login: React.FC = () => {
       await login(token);
 
       // Redirect to home page
-      navigate("/");
+      navigate("/app");
     } catch (error: any) {
       setErrorMsg(error.message);
     }
