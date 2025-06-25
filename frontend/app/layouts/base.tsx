@@ -3,6 +3,7 @@ import React from "react";
 import Header from "../components/common/header";
 import Footer from "../components/common/footer";
 import { Outlet } from "react-router";
+import { AuthProvider } from "~/context/AuthContext";
 
 interface BaseLayoutProps {}
 
@@ -14,16 +15,18 @@ interface BaseLayoutProps {}
  */
 const BaseLayout: React.FC<BaseLayoutProps> = () => {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
+    <AuthProvider>
+      <div className="flex flex-col min-h-screen">
+        <Header />
 
-      <main className="flex-grow">
-        {/* The Outlet renders whichever child route is currently active */}
-        <Outlet />
-      </main>
+        <main className="flex-grow">
+          {/* The Outlet renders whichever child route is currently active */}
+          <Outlet />
+        </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </AuthProvider>
   );
 };
 

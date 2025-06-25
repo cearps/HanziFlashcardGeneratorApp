@@ -4,8 +4,8 @@ export default [
   route("/", "layouts/base.tsx", [
     index("routes/home.tsx"),
 
-    route("login", "routes/auth/login.tsx"),
-    route("register", "routes/auth/register.tsx"),
+    route("/login", "routes/auth/login.tsx"),
+    route("/register", "routes/auth/register.tsx"),
 
     // Protected routes
     route("/app", "routes/protectedRoute.tsx", [

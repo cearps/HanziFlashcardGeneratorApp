@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
-import { API_BASE_URL } from "~/config/apiConfig";
+import * as AuthService from "~/services/AuthService";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -15,18 +15,7 @@ const Register: React.FC = () => {
     setErrorMsg("");
 
     try {
-      const response = await fetch(API_BASE_URL + "/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
-      });
-
-      if (!response.ok) {
-        // e.g., 400 or 500 error from backend
-        throw new Error("Failed to register. Possibly user already exists.");
-      }
-
-      // If successful, we might redirect to login, or auto-login:
+      await AuthService.register({ username, email, password });
       navigate("/login");
     } catch (error: any) {
       setErrorMsg(error.message);

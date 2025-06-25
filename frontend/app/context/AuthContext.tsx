@@ -1,30 +1,26 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router";
 import { API_BASE_URL } from "~/config/apiConfig";
+import * as UserService from "~/services/UserService";
+import type { User } from "~/types/user";
 
 // Define a user interface as needed
-interface User {
-  username: string;
-  email: string;
-  // other fields...
-}
-
 interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
+  verifying: boolean;
   login: (newToken: string) => Promise<void>;
   logout: () => void;
-  verifyToken: (overrideToken?: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   token: null,
   loading: true,
+  verifying: false,
   login: async () => {},
   logout: () => {},
-  verifyToken: async () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -33,6 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [verifying, setVerifying] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -49,51 +46,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // 1. Whenever 'token' changes, verify it
   //    If 'token' is null => setUser(null), else call verify.
   useEffect(() => {
-    if (token) {
-      verifyToken(token);
-    } else {
+    if (token && !user && !verifying) {
+      setVerifying(true);
+      UserService.fetchUser(token)
+        .then((currentUser: User) => {
+          setUser(currentUser);
+        })
+        .catch(() => {
+          // Token invalid or expired
+          logout();
+        })
+        .finally(() => {
+          setVerifying(false);
+        });
+    } else if (!token) {
       setUser(null);
     }
-    // eslint-disable-next-line
-  }, [token]);
-
-  // 2. verifyToken can also be called directly with an override token
-  const verifyToken = async (overrideToken?: string) => {
-    const localToken = overrideToken ?? token;
-    if (!localToken) {
-      setUser(null);
-      return;
-    }
-    try {
-      const response = await fetch(`${API_BASE_URL}/me`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localToken}`,
-        },
-      });
-      if (!response.ok) {
-        // Token invalid or expired => clear user & token
-        setUser(null);
-        localStorage.removeItem("jwt");
-        setToken(null);
-      } else {
-        const currentUser = await response.json();
-        // console.log("Verified user", currentUser);
-        setUser(currentUser);
-      }
-    } catch (err) {
-      setUser(null);
-      localStorage.removeItem("jwt");
-      setToken(null);
-    }
-  };
+  }, [token, user, verifying]);
 
   // 3. login sets token and localStorage
   //    The effect [token] will trigger verifyToken
   const login = async (newToken: string) => {
-    setToken(newToken);
     localStorage.setItem("jwt", newToken);
+    setToken(newToken);
   };
 
   // 4. logout clears user, token, localStorage
@@ -101,15 +76,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setUser(null);
     setToken(null);
     localStorage.removeItem("jwt");
+    navigate("/login");
   };
 
   const value: AuthContextType = {
     user,
     token,
     loading,
+    verifying,
     login,
     logout,
-    verifyToken,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

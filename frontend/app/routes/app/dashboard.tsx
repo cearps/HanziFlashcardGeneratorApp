@@ -63,9 +63,9 @@ const Dashboard: React.FC = () => {
             A quick look at your latest actions
           </p>
           <ul className="list-disc list-inside text-gray-700 space-y-1">
-            <li>Imported 20 words into “Spanish Deck”</li>
-            <li>Created a new deck “Japanese Kanji”</li>
-            <li>Edited a card in “French Verbs”</li>
+            <li># TODO</li>
+            <li># TODO</li>
+            <li># TODO</li>
           </ul>
         </div>
       </div>

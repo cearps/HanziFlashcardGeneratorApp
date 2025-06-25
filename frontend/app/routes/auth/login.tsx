@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { API_BASE_URL } from "~/config/apiConfig";
 import { useAuth } from "~/context/AuthContext";
+import * as AuthService from "~/services/AuthService";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/");
+      navigate("/app");
     }
   }, [user, navigate]);
 
@@ -22,27 +23,11 @@ const Login: React.FC = () => {
     setErrorMsg("");
 
     try {
-      const response = await fetch(API_BASE_URL + "/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usernameOrEmail, password }),
-      });
-
-      if (!response.ok) {
-        logout();
-        throw new Error("Invalid credentials or server error");
-      }
-
-      const data = await response.json();
-      // data should contain { token: '...' }
-      const token = data.token;
-
-      // Call the login method from AuthContext
+      const token = await AuthService.login({ usernameOrEmail, password });
       await login(token);
-
-      // Redirect to home page
       navigate("/app");
     } catch (error: any) {
+      logout();
       setErrorMsg(error.message);
     }
   };
