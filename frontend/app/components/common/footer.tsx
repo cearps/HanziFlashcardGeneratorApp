@@ -5,9 +5,12 @@ interface FooterProps {}
 
 const Footer: React.FC<FooterProps> = () => {
   return (
-    <footer className="bg-gray-100 mt-10">
-      <div className="mx-auto max-w-7xl px-4 py-4 text-center text-gray-500">
-        <p>&copy; {new Date().getFullYear()} MyWebsite. All rights reserved.</p>
+    <footer className="bg-muted mt-10">
+      <div className="container mx-auto p-4 text-center text-muted-foreground">
+        <p>
+          &copy; {new Date().getFullYear()} Hanzi Flashcard App. All rights
+          reserved.
+        </p>
       </div>
     </footer>
   );

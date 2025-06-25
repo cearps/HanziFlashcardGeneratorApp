@@ -7,12 +7,6 @@ import { AuthProvider } from "~/context/AuthContext";
 
 interface BaseLayoutProps {}
 
-/**
- * A layout component that:
- * - Renders <Header /> at the top
- * - Displays an <Outlet /> in the main area
- * - Renders <Footer /> at the bottom
- */
 const BaseLayout: React.FC<BaseLayoutProps> = () => {
   return (
     <AuthProvider>
@@ -20,7 +14,6 @@ const BaseLayout: React.FC<BaseLayoutProps> = () => {
         <Header />
 
         <main className="flex-grow">
-          {/* The Outlet renders whichever child route is currently active */}
           <Outlet />
         </main>
 

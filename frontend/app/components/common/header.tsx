@@ -1,7 +1,15 @@
 // src/components/Header.tsx
-import React, { useEffect } from "react";
+import React from "react";
 import { Link } from "react-router";
 import { useAuth } from "~/context/AuthContext";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
+} from "~/components/ui/navigation-menu";
+import { Button } from "~/components/ui/button";
 
 interface HeaderProps {}
 
@@ -13,52 +21,56 @@ const Header: React.FC<HeaderProps> = () => {
   }
 
   return (
-    <header className="bg-white shadow-md">
-      <div className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between">
+    <header className="bg-background border-b">
+      <div className="container mx-auto flex items-center justify-between p-4">
         {/* Logo or Site Name */}
-        <Link to="/" className="text-xl font-bold text-gray-800">
+        <Link to="/" className="text-xl font-bold">
           Hanzi Flashcard App
         </Link>
 
         {/* Navigation */}
-        <nav>
-          <ul className="flex space-x-4">
+        <NavigationMenu>
+          <NavigationMenuList>
             {user ? (
               <>
-                <li>
-                  <span className="text-gray-600">Hello, {user.username}</span>
-                </li>
-                <li>
-                  <Link
-                    to="/app/logout"
-                    className="text-gray-600 hover:text-gray-900 transition"
-                  >
-                    Logout
+                <NavigationMenuItem>
+                  <span className="px-4 py-2">Hello, {user.username}</span>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/app/">
+                    <NavigationMenuLink
+                      className={navigationMenuTriggerStyle()}
+                    >
+                      Dashboard
+                    </NavigationMenuLink>
                   </Link>
-                </li>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/app/logout">
+                    <Button variant="ghost">Logout</Button>
+                  </Link>
+                </NavigationMenuItem>
               </>
             ) : (
               <>
-                <li>
-                  <Link
-                    to="/register"
-                    className="text-gray-600 hover:text-gray-900 transition"
-                  >
-                    Register
+                <NavigationMenuItem>
+                  <Link to="/register">
+                    <NavigationMenuLink
+                      className={navigationMenuTriggerStyle()}
+                    >
+                      Register
+                    </NavigationMenuLink>
                   </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/login"
-                    className="text-gray-600 hover:text-gray-900 transition"
-                  >
-                    Login
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/login">
+                    <Button>Login</Button>
                   </Link>
-                </li>
+                </NavigationMenuItem>
               </>
             )}
-          </ul>
-        </nav>
+          </NavigationMenuList>
+        </NavigationMenu>
       </div>
     </header>
   );
