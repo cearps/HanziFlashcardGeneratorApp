@@ -13,6 +13,10 @@ export default [
       route("profile", "routes/app/profile.tsx"),
       route("settings", "routes/app/settings.tsx"),
       route("logout", "routes/auth/logout.tsx"),
+      // Wordlist routes
+      route("wordlist/wordlists", "routes/app/wordlist/wordlists.tsx"),
+      route("wordlist/create", "routes/app/wordlist/create.tsx"),
+      route("wordlist/:id", "routes/app/wordlist/detail.tsx"),
     ]),
 
     // Catch-all route

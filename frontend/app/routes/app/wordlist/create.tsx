@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useAuth } from "~/context/AuthContext";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -11,22 +12,44 @@ import {
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
+import * as WordListService from "~/services/WordListService";
 
 export default function CreateWordList() {
   const navigate = useNavigate();
+  const { token } = useAuth();
   const [name, setName] = useState("");
   const [words, setWords] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    // TODO: Implement word list creation logic
-    console.log({ name, words });
-
-    // For now, just navigate back to the word lists page
-    navigate("/app/wordlist/wordlists");
+    if (!token) {
+      setError("You must be logged in to create a word list.");
+      return;
+    }
+    setLoading(true);
+    try {
+      // 1. Create the wordlist (name only)
+      const created = await WordListService.createWordList(token, name);
+      const wordListId = created.id;
+      // 2. Parse words (one per line, trim, filter empty)
+      const wordArr = words
+        .split("\n")
+        .map((w) => w.trim())
+        .filter((w) => w.length > 0);
+      // 3. If there are words, batch add them
+      if (wordArr.length > 0) {
+        await WordListService.addWordsToWordList(token, wordListId, wordArr);
+      }
+      // 4. Navigate to wordlists page
+      navigate("/app/wordlist/wordlists");
+    } catch (err: any) {
+      setError(err.message || "Failed to create word list.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,6 +72,7 @@ export default function CreateWordList() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
+                  disabled={loading}
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
@@ -60,10 +84,13 @@ export default function CreateWordList() {
                   onChange={(e) => setWords(e.target.value)}
                   required
                   rows={10}
+                  disabled={loading}
                 />
               </div>
               {error && <p className="text-red-500">{error}</p>}
-              <Button type="submit">Create Word List</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Creating..." : "Create Word List"}
+              </Button>
             </div>
           </form>
         </CardContent>
