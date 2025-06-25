@@ -16,3 +16,43 @@ export const fetchUser = async (token: string): Promise<User> => {
 
   return response.json();
 };
+
+export const updateUsername = async (token: string, newUsername: string) => {
+  const response = await fetch(`${API_BASE_URL}/me/username`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ newUsername }),
+  });
+  return response.json();
+};
+
+export const updateEmail = async (token: string, newEmail: string) => {
+  const response = await fetch(`${API_BASE_URL}/me/email`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ newEmail }),
+  });
+  return response.json();
+};
+
+export const updatePassword = async (
+  token: string,
+  currentPassword: string,
+  newPassword: string
+) => {
+  const response = await fetch(`${API_BASE_URL}/me/password`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+  return response.json();
+};

@@ -10,6 +10,14 @@ import {
   navigationMenuTriggerStyle,
 } from "~/components/ui/navigation-menu";
 import { Button } from "~/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "~/components/ui/dropdown-menu";
 
 interface HeaderProps {}
 
@@ -34,7 +42,27 @@ const Header: React.FC<HeaderProps> = () => {
             {user ? (
               <>
                 <NavigationMenuItem>
-                  <span className="px-4 py-2">Hello, {user.username}</span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="px-4 py-2">
+                        Hello, {user.username}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Account</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/app/profile">Profile</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/app/settings">Settings</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/app/logout">Logout</Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link to="/app/">
@@ -43,11 +71,6 @@ const Header: React.FC<HeaderProps> = () => {
                     >
                       Dashboard
                     </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link to="/app/logout">
-                    <Button variant="ghost">Logout</Button>
                   </Link>
                 </NavigationMenuItem>
               </>
