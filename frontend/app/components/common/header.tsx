@@ -66,11 +66,9 @@ const Header: React.FC<HeaderProps> = () => {
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link to="/app/">
-                    <NavigationMenuLink
-                      className={navigationMenuTriggerStyle()}
-                    >
-                      Dashboard
-                    </NavigationMenuLink>
+                      <Button variant="ghost" className="px-4 py-2">
+                        Dashboard
+                      </Button>
                   </Link>
                 </NavigationMenuItem>
               </>
