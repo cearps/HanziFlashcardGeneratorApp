@@ -17,6 +17,11 @@ export default [
       route("wordlist/wordlists", "routes/app/wordlist/wordlists.tsx"),
       route("wordlist/create", "routes/app/wordlist/create.tsx"),
       route("wordlist/:id", "routes/app/wordlist/detail.tsx"),
+
+      // Flashcard Deck routes
+      route("decks", "routes/app/decks.tsx"),
+      route("decks/create", "routes/app/decks/create.tsx"),
+      route("decks/:deckId", "routes/app/decks/detail.tsx"),
     ]),
 
     // Catch-all route
