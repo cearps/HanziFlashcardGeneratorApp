@@ -8,4 +8,6 @@ import com.hanzifc.backend.entities.FlashcardEntity;
 
 public interface FlashcardRepository extends JpaRepository<FlashcardEntity, Long> {
     List<FlashcardEntity> findAllByFlashcardDeckId(Long flashcardDeckId);
+
+    boolean existsByRootWordIdAndFlashcardDeckId(Long rootWordId, Long flashcardDeckId);
 } 

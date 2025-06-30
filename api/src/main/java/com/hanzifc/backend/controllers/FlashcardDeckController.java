@@ -43,7 +43,7 @@ public class FlashcardDeckController {
     public record FlashcardDeckRequest(String name) { }
     public record FlashcardDeckResponse(long id, String name) { }
     public record FlashcardRequest(Long rootWordId, String englishTranslation, String pinyin, String exampleSentences, String pronunciationAudio, String image) { }
-    public record FlashcardResponse(Long id, String rootWord, String englishTranslation, String pinyin, String exampleSentences, String pronunciationAudio, String image) { }
+    public record FlashcardResponse(Long id, Long rootWordId, String rootWord, String englishTranslation, String pinyin, String exampleSentences, String pronunciationAudio, String image) { }
     public record DeleteFlashcardsRequest(List<Long> flashcardIds) { }
 
     @GetMapping
@@ -90,6 +90,7 @@ public class FlashcardDeckController {
                 .stream()
                 .map(fc -> new FlashcardResponse(
                         fc.getId(),
+                        fc.getRootWord().getId(),
                         fc.getRootWord().getWord(),
                         fc.getEnglishTranslation(),
                         fc.getPinyin(),
@@ -116,6 +117,16 @@ public class FlashcardDeckController {
         List<FlashcardResponse> responses = new java.util.ArrayList<>();
 
         for (FlashcardRequest request : requests) {
+            if (flashcardRepository.existsByRootWordIdAndFlashcardDeckId(request.rootWordId(), deckId)) {
+                // You might want to decide how to handle this. Skip, or throw an exception.
+                // For now, we'll just skip creating the duplicate.
+                // For a single-add operation on the front-end this would be a clear error.
+                // For batch, skipping might be better. Let's throw.
+                WordEntity word = wordRepository.findById(request.rootWordId()).orElse(null);
+                String wordText = word != null ? word.getWord() : "ID " + request.rootWordId();
+                throw new RuntimeException("Flashcard for '" + wordText + "' already exists in this deck.");
+            }
+
             WordEntity rootWord = wordRepository.findById(request.rootWordId())
                     .orElseThrow(() -> new RuntimeException("Root word not found!"));
 
@@ -136,6 +147,7 @@ public class FlashcardDeckController {
 
             responses.add(new FlashcardResponse(
                     newFlashcard.getId(),
+                    newFlashcard.getRootWord().getId(),
                     newFlashcard.getRootWord().getWord(),
                     newFlashcard.getEnglishTranslation(),
                     newFlashcard.getPinyin(),
