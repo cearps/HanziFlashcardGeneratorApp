@@ -19,7 +19,6 @@ const Dashboard: React.FC = () => {
   }
 
   if (!user) {
-    // Could also redirect if you want, e.g. <Navigate to="/login" /> in a real app
     return <p>Please log in to view your dashboard.</p>;
   }
 
@@ -30,27 +29,24 @@ const Dashboard: React.FC = () => {
         Create, manage, and export flashcards.
       </p>
 
-      {/* Cards Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Create Flashcards Card */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Create Flashcards</CardTitle>
+            <CardTitle>Flashcards</CardTitle>
             <CardDescription>
-              Create individual cards or batch import from word lists.
+              View and manage your flashcard decks.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link to="/app/wordlist/create">
-              <Button>Start Creating</Button>
+            <Link to="/app/decks">
+              <Button>View Flashcard Decks</Button>
             </Link>
           </CardContent>
         </Card>
 
-        {/* My Collections Card */}
         <Card>
           <CardHeader>
-            <CardTitle>My Word Lists</CardTitle>
+            <CardTitle>Word Lists</CardTitle>
             <CardDescription>
               View and manage your flashcard word lists.
             </CardDescription>
@@ -59,23 +55,6 @@ const Dashboard: React.FC = () => {
             <Link to="/app/wordlist/wordlists">
               <Button>View Word Lists</Button>
             </Link>
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
-              A quick look at your latest actions.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-              <li># TODO</li>
-              <li># TODO</li>
-              <li># TODO</li>
-            </ul>
           </CardContent>
         </Card>
       </div>
