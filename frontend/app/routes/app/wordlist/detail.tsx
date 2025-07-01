@@ -21,14 +21,14 @@ export default function WordListDetail() {
   const [error, setError] = useState("");
   const [newWord, setNewWord] = useState("");
   const [adding, setAdding] = useState(false);
-  const [removing, setRemoving] = useState<string | null>(null);
+  const [removing, setRemoving] = useState<any | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showBulkAddModal, setShowBulkAddModal] = useState(false);
   const [bulkAddText, setBulkAddText] = useState("");
   const [bulkAdding, setBulkAdding] = useState(false);
   const [bulkDeleteMode, setBulkDeleteMode] = useState(false);
-  const [selectedWords, setSelectedWords] = useState<string[]>([]);
+  const [selectedWords, setSelectedWords] = useState<any[]>([]);
   const [bulkDeleting, setBulkDeleting] = useState(false);
 
   // Fetch all wordlists and find the one with this id
@@ -57,7 +57,11 @@ export default function WordListDetail() {
       await WordListService.addWordsToWordList(token, wordList.id, [
         newWord.trim(),
       ]);
-      setWordList({ ...wordList, words: [...wordList.words, newWord.trim()] });
+      const data = await WordListService.getWordLists(token);
+      const wl = (data.wordLists || []).find(
+        (w: any) => String(w.id) === String(wordList.id)
+      );
+      setWordList(wl);
       setNewWord("");
     } catch (err: any) {
       setError(err.message || "Failed to add word.");
@@ -66,15 +70,17 @@ export default function WordListDetail() {
     }
   };
 
-  const handleRemoveWord = async (word: string) => {
+  const handleRemoveWord = async (word: any) => {
     if (!token || !wordList) return;
     setRemoving(word);
     setError("");
     try {
-      await WordListService.removeWordsFromWordList(token, wordList.id, [word]);
+      await WordListService.removeWordsFromWordList(token, wordList.id, [
+        word.word,
+      ]);
       setWordList({
         ...wordList,
-        words: wordList.words.filter((w: string) => w !== word),
+        words: wordList.words.filter((w: any) => w.id !== word.id),
       });
     } catch (err: any) {
       setError(err.message || "Failed to remove word.");
@@ -105,13 +111,20 @@ export default function WordListDetail() {
     const words = bulkAddText
       .split("\n")
       .map((w) => w.trim())
-      .filter((w) => w.length > 0 && !wordList.words.includes(w));
+      .filter(
+        (w) =>
+          w.length > 0 && !wordList.words.some((word: any) => word.word === w)
+      );
     if (words.length === 0) return;
     setBulkAdding(true);
     setError("");
     try {
       await WordListService.addWordsToWordList(token, wordList.id, words);
-      setWordList({ ...wordList, words: [...wordList.words, ...words] });
+      const data = await WordListService.getWordLists(token);
+      const wl = (data.wordLists || []).find(
+        (w: any) => String(w.id) === String(wordList.id)
+      );
+      setWordList(wl);
       setBulkAddText("");
       setShowBulkAddModal(false);
     } catch (err: any) {
@@ -130,11 +143,13 @@ export default function WordListDetail() {
       await WordListService.removeWordsFromWordList(
         token,
         wordList.id,
-        selectedWords
+        selectedWords.map((w) => w.word)
       );
       setWordList({
         ...wordList,
-        words: wordList.words.filter((w: string) => !selectedWords.includes(w)),
+        words: wordList.words.filter(
+          (w: any) => !selectedWords.some((sw) => sw.id === w.id)
+        ),
       });
       setSelectedWords([]);
       setBulkDeleteMode(false);
@@ -210,35 +225,37 @@ export default function WordListDetail() {
                 </div>
               )}
               <ul className="space-y-2 mb-4">
-                {wordList.words.map((word: string, idx: number) => (
+                {wordList.words.map((word: any, idx: number) => (
                   <li
-                    key={word}
+                    key={word.id}
                     className="flex justify-between items-center gap-2 border-b last:border-b-0 py-2"
                   >
                     <div className="flex items-center gap-2 flex-grow">
                       {bulkDeleteMode && (
                         <input
                           type="checkbox"
-                          checked={selectedWords.includes(word)}
+                          checked={selectedWords.some((w) => w.id === word.id)}
                           onChange={(e) => {
                             setSelectedWords((prev) =>
                               e.target.checked
                                 ? [...prev, word]
-                                : prev.filter((w) => w !== word)
+                                : prev.filter((w) => w.id !== word.id)
                             );
                           }}
                         />
                       )}
-                      <span className="truncate">{word}</span>
+                      <span className="truncate">{word.word}</span>
                     </div>
                     {!bulkDeleteMode && (
                       <Button
                         size="sm"
                         variant="destructive"
                         onClick={() => handleRemoveWord(word)}
-                        disabled={removing === word}
+                        disabled={removing && removing.id === word.id}
                       >
-                        {removing === word ? "Removing..." : "Remove"}
+                        {removing && removing.id === word.id
+                          ? "Removing..."
+                          : "Remove"}
                       </Button>
                     )}
                   </li>
